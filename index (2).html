@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>For Kanmani</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@300;600&display=swap');
+
+        /* --- 1. General Setup --- */
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: linear-gradient(180deg, #fff0f3 0%, #ffe6e9 100%);
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden;
+            touch-action: none; /* Disables default scrolling for drag logic */
+        }
+
+        /* --- 2. Beating Heart Bubble (Top Corner) --- */
+        .heart-bubble {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            font-size: 3rem;
+            animation: pulse 2s infinite ease-in-out;
+            z-index: 5;
+            filter: drop-shadow(0 0 10px rgba(255, 77, 109, 0.5));
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+
+        /* --- 3. Text --- */
+        h1 {
+            font-family: 'Pacifico', cursive;
+            color: #d63384;
+            font-size: 2rem;
+            text-align: center;
+            margin-top: 60px;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        p.caption {
+            font-size: 1rem;
+            color: #8e1c48;
+            text-align: center;
+            margin-bottom: 40px;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* --- 4. The Game Area --- */
+        .container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 20;
+        }
+
+        /* The Buttons */
+        .btn {
+            position: absolute;
+            border-radius: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease-out; /* Smooth movement for protection */
+        }
+
+        /* The Child (No) - Small and Cute */
+        #noBtn {
+            width: 80px;
+            height: 40px;
+            background: #fff;
+            color: #ff4d6d;
+            font-size: 0.9rem;
+            border: 2px solid #ffccd5;
+            top: 100px;
+            right: 60px; /* Positioned to the right */
+            z-index: 20; /* Lower priority */
+        }
+
+        /* The Mother (Yes) - Big and Protective */
+        #yesBtn {
+            width: 140px;
+            height: 60px;
+            background: #ff4d6d;
+            color: white;
+            font-size: 1.5rem;
+            top: 90px;
+            left: 60px; /* Positioned to the left */
+            z-index: 30; /* Higher priority - sits on top */
+        }
+
+        /* --- 5. The "Fake Cursor" (Love Stick) --- */
+        .drag-instruction {
+            position: absolute;
+            bottom: 100px;
+            color: #555;
+            font-size: 0.9rem;
+            pointer-events: none;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        #custom-cursor {
+            position: absolute;
+            bottom: 30px; /* Start at bottom */
+            width: 60px;
+            height: 60px;
+            font-size: 3rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: grab;
+            z-index: 100;
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.2));
+            touch-action: none; /* Crucial for dragging on mobile */
+        }
+
+        /* --- 6. Success Overlay --- */
+        #success-message {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 240, 243, 0.98);
+            z-index: 200;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        #success-message img {
+            width: 80%; border-radius: 20px;
+        }
+
+        /* --- 7. Slow Background Hearts --- */
+        .bg-element {
+            position: absolute;
+            bottom: -50px;
+            animation: floatUp linear infinite;
+            z-index: 1;
+            pointer-events: none;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(0); opacity: 0; }
+            30% { opacity: 0.6; }
+            100% { transform: translateY(-110vh); opacity: 0; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="heart-bubble">❤️</div>
+
+    <h1>Will you marry me, Kanmani?</h1>
+    <p class="caption">Drag the heart below to your answer!</p>
+
+    <div class="container">
+        <div id="yesBtn" class="btn">YES ❤️</div>
+        <div id="noBtn" class="btn">NO 🥺</div>
+    </div>
+
+    <p class="drag-instruction">👇 Drag me to answer! 👇</p>
+    
+    <div id="custom-cursor">💖</div>
+
+    <div id="success-message">
+        <h2 style="font-family: 'Pacifico'; color: #ff4d6d; font-size: 2.5rem;">I will protect you forever! ❤️</h2>
+        <img src="https://media.giphy.com/media/26BRv0ThflsHCqDrG/giphy.gif" alt="Love">
+    </div>
+
+    <script>
+        const cursor = document.getElementById('custom-cursor');
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtn = document.getElementById('noBtn');
+        const instruction = document.querySelector('.drag-instruction');
+
+        // Initial positions
+        let startX = window.innerWidth / 2 - 30; // Center
+        let startY = window.innerHeight - 100;
+        
+        // Set initial position of cursor
+        cursor.style.left = startX + 'px';
+        cursor.style.top = startY + 'px';
+
+        // Store original positions of buttons for resetting
+        const yesOriginal = { left: yesBtn.offsetLeft, top: yesBtn.offsetTop };
+        const noOriginal = { left: noBtn.offsetLeft, top: noBtn.offsetTop };
+
+        // --- DRAG LOGIC ---
+        let isDragging = false;
+
+        // Events for Mouse (Desktop) & Touch (Mobile)
+        cursor.addEventListener('mousedown', startDrag);
+        cursor.addEventListener('touchstart', startDrag, {passive: false});
+
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('touchmove', drag, {passive: false});
+
+        document.addEventListener('mouseup', endDrag);
+        document.addEventListener('touchend', endDrag);
+
+        function startDrag(e) {
+            isDragging = true;
+            instruction.style.opacity = '0'; // Hide instruction
+        }
+
+        function drag(e) {
+            if (!isDragging) return;
+            e.preventDefault(); // Stop screen scrolling
+
+            // Get pointer position (Touch or Mouse)
+            let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            let clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+            // Move the Heart Cursor
+            cursor.style.left = (clientX - 30) + 'px';
+            cursor.style.top = (clientY - 30) + 'px';
+
+            // --- THE PROTECTION LOGIC ---
+            checkProtection(clientX, clientY);
+        }
+
+        function checkProtection(x, y) {
+            // Get "No" button rect
+            const noRect = noBtn.getBoundingClientRect();
+            const yesRect = yesBtn.getBoundingClientRect();
+
+            // Calculate distance between Cursor and "No" button center
+            const noCenterX = noRect.left + noRect.width / 2;
+            const noCenterY = noRect.top + noRect.height / 2;
+            
+            const dist = Math.sqrt(Math.pow(x - noCenterX, 2) + Math.pow(y - noCenterY, 2));
+
+            // If Cursor is getting close to "No" (within 100px)
+            if (dist < 120) {
+                // MOTHER MODE: Yes button moves to cover No button
+                yesBtn.style.left = noBtn.offsetLeft + 'px';
+                yesBtn.style.top = noBtn.offsetTop + 'px';
+                yesBtn.style.transform = "scale(1.2)"; // Get bigger to protect
+                yesBtn.style.zIndex = "50"; // Ensure it's on top
+            } else {
+                // Return to normal if far away
+                yesBtn.style.left = "60px"; // Original CSS Left
+                yesBtn.style.top = "90px";  // Original CSS Top
+                yesBtn.style.transform = "scale(1)";
+            }
+        }
+
+        function endDrag(e) {
+            isDragging = false;
+            
+            // Check collision on drop
+            const cursorRect = cursor.getBoundingClientRect();
+            const yesRect = yesBtn.getBoundingClientRect();
+
+            // Did we drop the heart on the YES button?
+            // (Note: Since Yes covers No, dropping on No is technically dropping on Yes)
+            if (
+                cursorRect.left < yesRect.right &&
+                cursorRect.right > yesRect.left &&
+                cursorRect.top < yesRect.bottom &&
+                cursorRect.bottom > yesRect.top
+            ) {
+                document.getElementById('success-message').style.display = 'flex';
+            } else {
+                // If dropped nowhere, reset cursor to bottom
+                cursor.style.transition = "all 0.5s ease";
+                cursor.style.left = startX + 'px';
+                cursor.style.top = startY + 'px';
+                setTimeout(() => { cursor.style.transition = "none"; }, 500);
+            }
+        }
+
+
+        // --- SLOW BACKGROUND HEARTS ---
+        function createSlowHearts() {
+            const symbols = ['❤️', '✨', '🌸', '🤍'];
+            const element = document.createElement('div');
+            
+            element.classList.add('bg-element');
+            element.innerText = symbols[Math.floor(Math.random() * symbols.length)];
+            
+            element.style.left = Math.random() * 100 + 'vw';
+            element.style.fontSize = Math.random() * 20 + 10 + 'px';
+            element.style.animationDuration = Math.random() * 10 + 15 + 's'; // 15-25 seconds (Very Slow)
+            
+            document.body.appendChild(element);
+            setTimeout(() => { element.remove(); }, 25000);
+        }
+        setInterval(createSlowHearts, 1000);
+
+    </script>
+</body>
+</html>
